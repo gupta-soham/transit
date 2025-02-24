@@ -2,45 +2,51 @@ import { PrismaClient } from '@prisma/client';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { phoneNumber } from 'better-auth/plugins';
+import { Resend } from 'resend';
 
 const prisma = new PrismaClient();
+const resend = new Resend(process.env.RESEND_API_KEY!);
 export const auth = betterAuth({
+    appName: "transit_auth",
     database: prismaAdapter(prisma, {
         provider: "postgresql",
     }),
     emailAndPassword: {
         enabled: true,
-        // requireEmailVerification: true,
-        sendResetPassword: async ({ user, url, token }, request) => {
-            // await sendEmail({
-            //   to: user.email,
-            //   subject: "Reset your password",
-            //   text: `Click the link to reset your password: ${url}`,
-            // });
+        sendResetPassword: async ({ user, url }) => {
+            await resend.emails.send({
+                from: "Transit <onboarding@transt.co>",
+                to: user.email,
+                subject: "Reset your password",
+                html: `Click the link to reset your password: ${url}`,
+            });
         },
         resetPasswordTokenExpiresIn: 0.25, // 15 minutes
+        requireEmailVerification: true,
         autoSignIn: true,
-        maxPasswordLength: 18,
+        minPasswordLength: 8,
+        maxPasswordLength: 20,
     },
 
     emailVerification: {
         sendVerificationEmail: async ({ user, url, token }, request) => {
-            // await sendEmail({
-            //     to: user.email,
-            //     subject: "Verify your email address",
-            //     text: `Click the link to verify your email: ${url}`,
-            // });
+            await resend.emails.send({
+                from: "Transit <onboarding@transt.co>",
+                to: user.email,
+                subject: "Verify your email address",
+                text: `Click the link to verify your email: ${url}`,
+            });
         },
     },
 
 
-    socialProviders: {
-        google: {
-            clientId: process.env.GOOGLE_CLIENT_ID!,
-            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-            redirectUri: process.env.BETTER_AUTH_URL! + "/api/auth/callback/google"
-        },
-    },
+    // socialProviders: {
+    //     google: {
+    //         clientId: process.env.GOOGLE_CLIENT_ID!,
+    //         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    //         redirectUri: process.env.BETTER_AUTH_URL! + "/api/auth/callback/google"
+    //     },
+    // },
 
     plugins: [
         phoneNumber({
