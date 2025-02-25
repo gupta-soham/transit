@@ -81,16 +81,16 @@ model Verification {
 
 // FamilyMember model stores additional people associated with the main user
 model FamilyMember {
-  id       String   @id @default(cuid())
-  userId   String
-  name     String
-  dob      DateTime
-  gender   String
-  phone    String?
-  email    String?
-  passport String?
+  id          String   @id @default(cuid())
+  name        String
+  dob         DateTime
+  gender      String
+  phoneNumber String?
+  email       String?
+  passport    String?
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // PaymentMethod model for storing credit/debit card info

@@ -7,7 +7,7 @@ const authRouter = express.Router();
 authRouter.post('/register/email', async (req, res) => {
     console.log("Register route hit", req.body);
     try {
-        const validatedData = SignupSchema.parse(req.body); 
+        const validatedData = SignupSchema.parse(req.body);
         console.log("Data validated", validatedData);
         const response = await auth.api.signUpEmail({ body: validatedData });
         console.log("Registration successful", response);
@@ -40,6 +40,7 @@ authRouter.post('/verify-email', async (req, res) => {
     try {
         const validatedData = LoginSchema.parse(req.body);
         const response = await auth.api.sendVerificationEmail({ body: validatedData });
+        if (response) console.log("Verification Email Sent!");
         res.status(200).json(response);
     } catch (error) {
         if (error instanceof Error) {

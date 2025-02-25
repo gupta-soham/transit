@@ -29,16 +29,17 @@ export const auth = betterAuth({
     },
 
     emailVerification: {
-        sendVerificationEmail: async ({ user, url, token }, request) => {
+        sendOnSignUp: true, // Automatically sends a verification email at signup
+        autoSignInAfterVerification: true, // Automatically signIn the user after verification
+        sendVerificationEmail: async ({ user, url }) => {
             await resend.emails.send({
-                from: "Transit <onboarding@transt.co>",
+                from: "Transit <onboarding@resend.dev>",
                 to: user.email,
                 subject: "Verify your email address",
                 text: `Click the link to verify your email: ${url}`,
             });
         },
     },
-
 
     // socialProviders: {
     //     google: {

@@ -26,6 +26,7 @@
     "cors": "^2.8.5",
     "express": "^4.21.2",
     "install": "^0.13.0",
+    "libphonenumber-js": "^1.11.20",
     "prisma": "^6.4.1",
     "resend": "^4.1.2",
     "ts-node": "^10.9.2",

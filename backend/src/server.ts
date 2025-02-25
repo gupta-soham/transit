@@ -7,14 +7,14 @@ import rootRouter from "./routes/index.ts";
 const app = express();
 const port = process.env.PORT || 8000;
 
-app.all("/api/auth/*", toNodeHandler(auth));
+app.all("/api/auth/middleware/*", toNodeHandler(auth));
 
 // Mount express json middleware after Better Auth handler
 // or only apply it to routes that don't interact with Better Auth
 app.use(express.json());
 app.use(cors());
 
-app.use('/', rootRouter);
+app.use('/api', rootRouter);
 
 app.get("/api/me", async (req, res): Promise<any> => {
     try {
