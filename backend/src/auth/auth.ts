@@ -6,6 +6,7 @@ import { Resend } from 'resend';
 
 const prisma = new PrismaClient();
 const resend = new Resend(process.env.RESEND_API_KEY!);
+
 export const auth = betterAuth({
     appName: "transit_auth",
     database: prismaAdapter(prisma, {
@@ -13,15 +14,16 @@ export const auth = betterAuth({
     }),
     emailAndPassword: {
         enabled: true,
-        sendResetPassword: async ({ user, url }) => {
+        sendResetPassword: async ({ user, token }) => {
+            const resetUrl = `${process.env.FRONTEND_APP_URL}/reset-password/?token=${token}`;
             await resend.emails.send({
-                from: "Transit <onboarding@transt.co>",
+                from: "Transit<noreply@transitco.in>",
                 to: user.email,
                 subject: "Reset your password",
-                html: `Click the link to reset your password: ${url}`,
+                html: `Click the link to reset your password: ${resetUrl}`,
             });
         },
-        resetPasswordTokenExpiresIn: 0.25, // 15 minutes
+        resetPasswordTokenExpiresIn: 900, // 15 minutes
         requireEmailVerification: true,
         autoSignIn: true,
         minPasswordLength: 8,
@@ -29,30 +31,31 @@ export const auth = betterAuth({
     },
 
     emailVerification: {
-        sendOnSignUp: true, // Automatically sends a verification email at signup
-        autoSignInAfterVerification: true, // Automatically signIn the user after verification
-        sendVerificationEmail: async ({ user, url }) => {
+        sendOnSignUp: true,
+        autoSignInAfterVerification: true,
+        sendVerificationEmail: async ({ user, token }) => {
+            const verifyUrl = `${process.env.FRONTEND_APP_URL}/verify-email/?token=${token}`;
             await resend.emails.send({
-                from: "Transit <onboarding@resend.dev>",
+                from: "Transit <noreply@transitco.in>",
                 to: user.email,
                 subject: "Verify your email address",
-                text: `Click the link to verify your email: ${url}`,
+                text: `Click the link to verify your email: ${verifyUrl}`,
             });
         },
     },
 
-    // socialProviders: {
-    //     google: {
-    //         clientId: process.env.GOOGLE_CLIENT_ID!,
-    //         clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-    //         redirectUri: process.env.BETTER_AUTH_URL! + "/api/auth/callback/google"
-    //     },
-    // },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID!,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            redirectUri: process.env.BETTER_AUTH_URL! + "/api/auth/callback/google"
+        },
+    },
 
     plugins: [
         phoneNumber({
             // Function to send OTP code via SMS.
-            sendOTP: async ({ phoneNumber, code }, request) => {
+            sendOTP: async ({ phoneNumber, code }) => {
                 // Replace this with your SMS provider's API call.
                 // Example using Twilio (pseudo-code):
                 // await twilioClient.messages.create({
@@ -62,15 +65,14 @@ export const auth = betterAuth({
                 // });
                 console.log(`Sending OTP ${code} to phone number ${phoneNumber}`);
             },
-            // Optional configuration to allow phone number based sign up.
-            signUpOnVerification: {
-                getTempEmail: (phoneNumber) => `${phoneNumber}@my-site.com`,
-                getTempName: (phoneNumber) => phoneNumber,
-            },
             // Optional callback after successful phone number verification.
             callbackOnVerification: async ({ phoneNumber, user }, request) => {
                 console.log(`Phone number ${phoneNumber} verified for user ${user.id}`);
-            }
+            },
+            expiresIn: 300, // 5 minutes
+            otpLength: 6, // 6-digit code (default)
         })
-    ]
+    ],
+
+    trustedOrigins: ["http://localhost:5173"],
 });

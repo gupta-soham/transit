@@ -1,24 +1,7 @@
 import { isValidPhoneNumber } from "libphonenumber-js";
 import { z } from "zod";
 
-const genderOptions = ["male", "female", "non-binary", "prefer not to say"] as const;
-
-const SignupSchema = z
-    .object({
-        name: z
-            .string()
-            .min(3, { message: "Minimum 3 characters are required" })
-            .max(25, { message: "Maximum of 20 characters are allowed" }),
-        email: z
-            .string()
-            .email({ message: "Invalid email address" })
-            .min(1, { message: "Email is required" }),
-        password: z
-            .string()
-            .min(8, { message: "Password must be at least 8 characters long" })
-            .max(20, { message: "Password must be at most 20 characters long" }),
-        image: z.string().optional(),
-    })
+const genderOptions = ["male", "female", "transgender"] as const;
 
 const LoginSchema = z.object({
     email: z
@@ -31,24 +14,6 @@ const LoginSchema = z.object({
         .max(20, { message: "Password must be at most 20 characters long" }),
 })
 
-const ForgotPasswordSchema = z.object({
-    email: z
-        .string()
-        .email({ message: "Invalid email address" })
-        .min(1, { message: "Email is required" }),
-})
-
-const ChangePasswordSchema = z.object({
-    currentPassword: z
-        .string()
-        .min(8, { message: "Password must be at least 8 characters long" })
-        .max(20, { message: "Password must be at most 20 characters long" }),
-    newPassword: z
-        .string()
-        .min(8, { message: "Password must be at least 8 characters long" })
-        .max(20, { message: "Password must be at most 20 characters long" }),
-    revokeOtherSessions: z.boolean().optional(),
-});
 
 const paymentMethodSchema = z.object({
     cardHolder: z.string(),
@@ -99,4 +64,4 @@ const onboardingSchema = z.object({
     }).optional(),
 });
 
-export { SignupSchema, LoginSchema, ForgotPasswordSchema, ChangePasswordSchema, familyMemberSchema, paymentMethodSchema, onboardingSchema };  
+export { LoginSchema, familyMemberSchema, paymentMethodSchema, onboardingSchema };  

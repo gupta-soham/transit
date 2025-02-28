@@ -22,11 +22,11 @@ model User {
   dob                 DateTime?
   passport            String?
 
-  sessions       Session[]
-  accounts       Account[]
-  familyMembers  FamilyMember[]
-  paymentMethods PaymentMethod[]
-  bookings       Booking[]
+  sessions      Session[]
+  accounts      Account[]
+  familyMembers FamilyMember[]
+  // paymentMethods PaymentMethod[]
+  // bookings      Booking[]
 
   @@unique([phoneNumber])
   @@map("user")
@@ -93,45 +93,44 @@ model FamilyMember {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-// PaymentMethod model for storing credit/debit card info
-model PaymentMethod {
-  id          String   @id @default(cuid())
-  cardHolder  String
-  cardType    String // You might also use an enum (e.g., VISA, MASTERCARD, etc.)
-  last4       String // Storing only the last 4 digits for display
-  expiryMonth Int
-  expiryYear  Int
-  token       String? // Tokenized card info from your payment gateway
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+// // PaymentMethod model for storing credit/debit card info
+// model PaymentMethod {
+//   id          String   @id @default(cuid())
+//   cardHolder  String
+//   cardType    String // You might also use an enum (e.g., VISA, MASTERCARD, etc.)
+//   last4       String // Storing only the last 4 digits for display
+//   expiryMonth Int
+//   expiryYear  Int
+//   token       String? // Tokenized card info from your payment gateway
+//   createdAt   DateTime @default(now())
+//   updatedAt   DateTime @updatedAt
 
-  userId  String
-  user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  Booking Booking[]
-}
+//   userId  String
+//   user    User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   Booking Booking[]
+// }
 
 // Enum for different booking types
-
-enum BookingType {
-  FLIGHT
-  HOTEL
-  BUS
-  TRAIN
-  PACKAGE
-}
+// enum BookingType {
+//   FLIGHT
+//   HOTEL
+//   BUS
+//   TRAIN
+//   PACKAGE
+// }
 
 // Booking model to store any type of travel booking.
-model Booking {
-  id              String      @id @default(cuid())
-  userId          String
-  bookingType     BookingType
-  reference       String // Booking reference number from external providers
-  details         Json? // Additional booking details (e.g. flight number, hotel address)
-  amount          Decimal
-  paymentMethodId String? // Link to the payment method used, if applicable
-  status          String // e.g., confirmed, pending, cancelled
-  bookedAt        DateTime    @default(now())
+// model Booking {
+//   id              String      @id @default(cuid())
+//   bookingType     BookingType
+//   reference       String // Booking reference number from external providers
+//   details         Json? // Additional booking details (e.g. flight number, hotel address)
+//   amount          Decimal
+//   paymentMethodId String? // Link to the payment method used, if applicable
+//   status          String // e.g., confirmed, pending, cancelled
+//   bookedAt        DateTime    @default(now())
 
-  user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
-  paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
-}
+//   userId        String
+//   user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+//   paymentMethod PaymentMethod? @relation(fields: [paymentMethodId], references: [id])
+// }
