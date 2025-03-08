@@ -84,7 +84,7 @@ userRouter.post('/login/phone', async (req, res) => {
 //         const response = await auth.api.signInSocial({
 //             body: {
 //                 provider: "google",
-//                 callbackURL: `${process.env.FRONTEND_URL}/dashboard`,
+//                 callbackURL: `${process.env.FRONTEND_APP_URL}/dashboard`,
 //             },
 //         });
 //         res.status(200).json(response);
