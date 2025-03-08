@@ -33,12 +33,11 @@ const familyMemberSchema = z.object({
         .max(new Date(), { message: "Date of birth cannot be in the future" })
         .min(new Date("1900-01-01"), { message: "Date of birth is too far in the past" }),
     gender: z.enum(genderOptions, { message: "Invalid gender selection" }),
-    phoneNumber: z // Example: +919899998898
+    phoneNumber: z
         .string()
-        .refine((val) => isValidPhoneNumber(val), {
-            message: "Invalid phone number",
-        })
-        .optional(),
+        .refine((val) => isValidPhoneNumber("+91" + val) || isValidPhoneNumber(val), {
+            message: "Invalid phone number"
+        }).optional(),
     email: z.string().email({ message: "Invalid email address" }).optional(),
     passport: z.string().regex(/^[a-zA-Z0-9]+$/, {
         message: "Passport number must contain only alphanumeric characters",
@@ -53,15 +52,26 @@ const onboardingSchema = z.object({
         .max(new Date(), { message: "Date of birth cannot be in the future" })
         .min(new Date("1920-01-01"), { message: "Date of birth is too far in the past" }),
     gender: z.enum(genderOptions, { message: "Invalid gender selection" }),
-    phoneNumber: z // Example: +919899998898
+    phoneNumber: z
         .string()
-        .refine((val) => isValidPhoneNumber(val), {
-            message: "Invalid phone number",
-        })
-        .optional(),
+        .refine((val) => isValidPhoneNumber("+91" + val) || isValidPhoneNumber(val), {
+            message: "Invalid phone number"
+        }),
     passport: z.string().regex(/^[a-zA-Z0-9]+$/, {
         message: "Passport number must contain only alphanumeric characters",
     }).optional(),
 });
 
-export { LoginSchema, familyMemberSchema, paymentMethodSchema, onboardingSchema };  
+const phoneLoginSchema = z.object({
+    phoneNumber: z
+        .string()
+        .refine((val) => isValidPhoneNumber("+91" + val) || isValidPhoneNumber(val), {
+            message: "Invalid phone number"
+        }),
+    password: z
+        .string()
+        .min(8, { message: "Password must be at least 8 characters long" })
+        .max(20, { message: "Password must be at most 20 characters long" }),
+});
+
+export { LoginSchema, familyMemberSchema, paymentMethodSchema, onboardingSchema, phoneLoginSchema };  

@@ -1,7 +1,7 @@
 import express from 'express';
-import { onboardingSchema } from '../validators/types.ts';
+import { LoginSchema, onboardingSchema, phoneLoginSchema } from '../validators/types.ts';
 import { PrismaClient } from '@prisma/client';
-// import { auth } from '../auth/auth.ts';
+import { auth } from '../auth/auth.ts';
 
 const userRouter = express.Router();
 const prisma = new PrismaClient();
@@ -17,7 +17,7 @@ userRouter.post('/onboarding', async (req, res): Promise<any> => {
             }
         });
         console.log("User details saved successfully: ", userUpdate.email);
-        return res.status(201).json({ message: 'successfully saved information', userId: userUpdate.id });
+        return res.status(201).json({ message: 'Successfully saved information', userId: userUpdate.id });
     } catch (error) {
         console.error(error);
         return res.status(500).json({ error: 'Server error saving user details' });
@@ -50,6 +50,52 @@ userRouter.get('/details', async (req, res): Promise<any> => {
         return res.status(500).json({ error: 'Server error fetching user details' });
     }
 });
+
+userRouter.post('/login/email', async (req, res) => {
+    try {
+        const validatedData = LoginSchema.parse(req.body);
+        const response = await auth.api.signInEmail({ body: validatedData });
+        res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
+
+userRouter.post('/login/phone', async (req, res) => {
+    try {
+        const validatedData = phoneLoginSchema.parse(req.body);
+        const response = await auth.api.signInPhoneNumber({ body: validatedData });
+        res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
+
+// userRouter.get('/login/google', async (req, res) => {
+//     try {
+//         const response = await auth.api.signInSocial({
+//             body: {
+//                 provider: "google",
+//                 callbackURL: `${process.env.FRONTEND_URL}/dashboard`,
+//             },
+//         });
+//         res.status(200).json(response);
+//     } catch (error) {
+//         if (error instanceof Error) {
+//             res.status(400).json({ error: error.message });
+//         } else {
+//             res.status(400).json({ error });
+//         }
+//     }
+// });
 
 // userRouter.post('/verify-email', async (req, res) => {
 //     try {

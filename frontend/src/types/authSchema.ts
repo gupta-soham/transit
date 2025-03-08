@@ -53,12 +53,11 @@ export const OnboardingSchema = z.
       .max(new Date(), { message: "Date of birth cannot be in the future" })
       .min(new Date("1920-01-01"), { message: "Date of birth is too far in the past" }),
     gender: z.enum(genderOptions, { message: "Invalid gender selection" }),
-    phoneNumber: z // Example: +919899998898
+    phoneNumber: z
       .string()
-      .refine((val) => isValidPhoneNumber(val), {
-        message: "Invalid phone number",
-      })
-      .optional(),
+      .refine((val) => isValidPhoneNumber("+91" + val) || isValidPhoneNumber(val), {
+        message: "Invalid phone number"
+      }),
     passport: z.string().regex(/^[a-zA-Z0-9]+$/, {
       message: "Passport number must contain only alphanumeric characters",
     }).optional(),

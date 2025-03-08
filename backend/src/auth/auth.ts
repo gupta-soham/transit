@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import axios from 'axios';
 import { betterAuth } from 'better-auth';
 import { prismaAdapter } from 'better-auth/adapters/prisma';
 import { phoneNumber } from 'better-auth/plugins';
@@ -56,14 +57,25 @@ export const auth = betterAuth({
         phoneNumber({
             // Function to send OTP code via SMS.
             sendOTP: async ({ phoneNumber, code }) => {
-                // Replace this with your SMS provider's API call.
-                // Example using Twilio (pseudo-code):
-                // await twilioClient.messages.create({
-                //   to: phoneNumber,
-                //   from: process.env.TWILIO_PHONE,
-                //   body: `Your OTP code is: ${code}`
-                // });
-                console.log(`Sending OTP ${code} to phone number ${phoneNumber}`);
+                // Send OTP via Fast2SMS API
+                try {
+                    const response = await axios.post("https://www.fast2sms.com/dev/bulkV2",
+                        {   
+                            "message": `Your OTP code for Transit is: ${code}`,
+                            "language": "english",
+                            "route": "q",
+                            "numbers": phoneNumber
+                        },
+                        {
+                            headers: { "authorization": process.env.FAST2SMS_API_KEY! }
+                        }
+                    );
+                    console.log(`Sent OTP ${code} to phone number ${phoneNumber}`);
+                    return response.data;
+                } catch (error) {
+                    console.error("Error sending OTP:", error);
+                    throw error;
+                }
             },
             // Optional callback after successful phone number verification.
             callbackOnVerification: async ({ phoneNumber, user }, request) => {
