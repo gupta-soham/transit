@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { familyMemberSchema } from '../validators/types.ts';
+import { familyMemberSchema } from '../validators/types';
 
 const memberRouter = express.Router();
 const prisma = new PrismaClient();

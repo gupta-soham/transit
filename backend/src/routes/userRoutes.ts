@@ -1,7 +1,7 @@
 import express from 'express';
-import { LoginSchema, onboardingSchema, phoneLoginSchema } from '../validators/types.ts';
+import { LoginSchema, onboardingSchema, phoneLoginSchema } from '../validators/types';
 import { PrismaClient } from '@prisma/client';
-import { auth } from '../auth/auth.ts';
+import { auth } from '../auth/auth';
 
 const userRouter = express.Router();
 const prisma = new PrismaClient();
