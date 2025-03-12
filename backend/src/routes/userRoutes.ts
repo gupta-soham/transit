@@ -1,5 +1,5 @@
 import express from 'express';
-import { LoginSchema, onboardingSchema, phoneLoginSchema } from '../validators/types';
+import { LoginSchema, onboardingSchema, OTPVerificationSchema, phoneLoginSchema, SignupSchema } from '../validators/types';
 import { PrismaClient } from '@prisma/client';
 import { auth } from '../auth/auth';
 
@@ -51,6 +51,20 @@ userRouter.get('/details', async (req, res): Promise<any> => {
     }
 });
 
+userRouter.post('/register/email', async (req, res): Promise<any> => {
+    try {
+        const validatedData = SignupSchema.parse(req.body);
+        const response = await auth.api.signUpEmail({ body: validatedData, callbackURL: "" });
+        return res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            return res.status(400).json({ error: error.message });
+        } else {
+            return res.status(400).json({ error });
+        }
+    }
+});
+
 userRouter.post('/login/email', async (req, res) => {
     try {
         const validatedData = LoginSchema.parse(req.body);
@@ -79,45 +93,77 @@ userRouter.post('/login/phone', async (req, res) => {
     }
 });
 
-// userRouter.get('/login/google', async (req, res) => {
-//     try {
-//         const response = await auth.api.signInSocial({
-//             body: {
-//                 provider: "google",
-//                 callbackURL: `${process.env.FRONTEND_APP_URL}/dashboard`,
-//             },
-//         });
-//         res.status(200).json(response);
-//     } catch (error) {
-//         if (error instanceof Error) {
-//             res.status(400).json({ error: error.message });
-//         } else {
-//             res.status(400).json({ error });
-//         }
-//     }
-// });
+userRouter.get('/login/google', async (req, res) => {
+    try {
+        const response = await auth.api.signInSocial({
+            body: {
+                provider: "google",
+                callbackURL: `${process.env.FRONTEND_APP_URL}/dashboard`,
+            },
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
 
-// userRouter.post('/verify-email', async (req, res) => {
-//     try {
-//         const validatedData = LoginSchema.parse(req.body);
-//         const isVerified = await prisma.user.findUnique({
-//             where: { email: validatedData.email },
-//             select: { emailVerified: true }
-//         })
-//         if (isVerified?.emailVerified) {
-//             res.status(200).json({ message: "Email is already verified" });
-//         } else {
-//             const response = await auth.api.sendVerificationEmail({ body: validatedData });
-//             if (response) console.log("Verification Email Sent!");
-//             res.status(200).json(response);
-//         }
-//     } catch (error) {
-//         if (error instanceof Error) {
-//             res.status(400).json({ error: error.message });
-//         } else {
-//             res.status(400).json({ error });
-//         }
-//     }
-// })
+userRouter.post('/verify-email', async (req, res) => {
+    try {
+        const validatedData = LoginSchema.parse(req.body);
+        const isVerified = await prisma.user.findUnique({
+            where: { email: validatedData.email },
+            select: { emailVerified: true }
+        })
+        if (isVerified?.emailVerified) {
+            res.status(200).json({ message: "Email is already verified" });
+        } else {
+            const response = await auth.api.sendVerificationEmail({ body: validatedData });
+            if (response) console.log("Verification Email Sent!");
+            res.status(200).json(response);
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
+
+userRouter.post('/send-otp', async (req, res) => {
+    try {
+        const validatedData = phoneLoginSchema.parse(req.body);
+        const response = await auth.api.sendPhoneNumberOTP({ body: validatedData });
+        res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
+
+userRouter.post('/verify-otp', async (req, res) => {
+    try {
+        const validatedData = OTPVerificationSchema.parse(req.body);
+        const response = await auth.api.verifyPhoneNumber({
+            body: validatedData,
+            updatePhoneNumber: true,
+            disableSession: true,
+        });
+        res.status(200).json(response);
+    } catch (error) {
+        if (error instanceof Error) {
+            res.status(400).json({ error: error.message });
+        } else {
+            res.status(400).json({ error });
+        }
+    }
+});
 
 export default userRouter;
