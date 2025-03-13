@@ -3,6 +3,117 @@ import { flightsData } from '../data/flights';
 
 const travelRouter = express.Router();
 
+/**
+ * @swagger
+ * /api/travel/flights:
+ *   get:
+ *     summary: Get available flight details
+ *     description: Fetch flights based on origin, destination, and travel dates.
+ *     tags: [Travel]
+ *     parameters:
+ *       - in: query
+ *         name: originLocationCode
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Departure airport IATA code (e.g., DEL)
+ *       - in: query
+ *         name: destinationLocationCode
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: Arrival airport IATA code (e.g., BOM)
+ *       - in: query
+ *         name: departureDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: true
+ *         description: Departure date in YYYY-MM-DD format
+ *       - in: query
+ *         name: returnDate
+ *         schema:
+ *           type: string
+ *           format: date
+ *         required: false
+ *         description: Return date in YYYY-MM-DD format (optional)
+ *       - in: query
+ *         name: adults
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         required: false
+ *         description: Number of adult passengers. Default is 1.
+ *       - in: query
+ *         name: max
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         required: false
+ *         description: Maximum number of results. Default is 10.
+ *     responses:
+ *       200:
+ *         description: A list of available flights
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     count:
+ *                       type: integer
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       numberOfBookableSeats:
+ *                         type: integer
+ *                       itineraries:
+ *                         type: array
+ *                         items:
+ *                           type: object
+ *                           properties:
+ *                             segments:
+ *                               type: array
+ *                               items:
+ *                                 type: object
+ *                                 properties:
+ *                                   departure:
+ *                                     type: object
+ *                                     properties:
+ *                                       iataCode:
+ *                                         type: string
+ *                                       at:
+ *                                         type: string
+ *                                         format: date-time
+ *                                   arrival:
+ *                                     type: object
+ *                                     properties:
+ *                                       iataCode:
+ *                                         type: string
+ *                                       at:
+ *                                         type: string
+ *                                         format: date-time
+ *                       price:
+ *                         type: object
+ *                         properties:
+ *                           currency:
+ *                             type: string
+ *                           total:
+ *                             type: string
+ *       400:
+ *         description: Invalid request parameters
+ *       500:
+ *         description: Internal server error
+ */
+
+
+
 travelRouter.get('/flights', async (req, res): Promise<any> => {
     try {
         // Extract query parameters
