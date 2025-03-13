@@ -28,7 +28,7 @@
     "libphonenumber-js": "^1.11.20",
     "resend": "^4.1.2",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
+    "swagger-ui-express": "5.0.0",
     "zod": "^3.24.2"
   }
 }

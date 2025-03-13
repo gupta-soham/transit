@@ -30,5 +30,5 @@ app.get('/', (req, res) => {
 
 app.listen(port, () => {
     console.log(`Better Auth app listening on port ${port}`);
-    console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
+    console.log(`Swagger docs available at ${process.env.BETTER_AUTH_URL}/api-docs`);
 });
