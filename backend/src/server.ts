@@ -25,10 +25,8 @@ app.use('/api', rootRouter);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to the Express server with Prisma and Better Auth' });
-    
 });
 
 app.listen(port, () => {
     console.log(`Better Auth app listening on port ${port}`);
-    console.log(`Swagger docs available at ${process.env.BETTER_AUTH_URL}/api-docs`);
 });

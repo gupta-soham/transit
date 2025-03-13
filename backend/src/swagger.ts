@@ -1,8 +1,9 @@
+import { Express } from "express";
+import basicAuth from "express-basic-auth";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import { Express } from "express";
 
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.0.0/swagger-ui.min.css"
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css"
 
 const options: swaggerJsdoc.Options = {
   definition: {
@@ -13,9 +14,8 @@ const options: swaggerJsdoc.Options = {
       description: "This is the API documentation for the backend service.",
     },
     servers: [
-      {
-        url: process.env.BETTER_AUTH_URL || "http://localhost:8000",
-      },
+      { url: "http://localhost:8000", description: "Local server" },
+      { url: "https://transit-be.vercel.app", description: "Production server" },
     ],
   },
   apis: ["./**/*.ts"], // Ensures all .ts files, including routes, are scanned
@@ -23,10 +23,26 @@ const options: swaggerJsdoc.Options = {
 
 const swaggerSpec = swaggerJsdoc(options);
 
-export const setupSwagger = (app: Express) => {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-    customCss:
-      '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }',
-    customCssUrl: CSS_URL,
-  }));
-};
+export function setupSwagger(app: Express) {
+  // Protect Swagger with Basic Auth in production
+  if (process.env.NODE_ENV === "production") {
+    app.use(
+      "/api/docs",
+      basicAuth({
+        users: { admin: "securepassword123" },
+        challenge: true,
+      }),
+      swaggerUi.serve,
+      swaggerUi.setup(swaggerSpec)
+    );
+  } else {
+    // Allow open access in development
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
+      customCss:
+        '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }',
+      customCssUrl: CSS_URL,
+    }
+    ))
+  }
+  console.log(`📄 Swagger UI available at: ${process.env.BETTER_AUTH_URL}/api/docs`);
+}
