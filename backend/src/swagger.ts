@@ -12,7 +12,7 @@ const options: swaggerJsdoc.Options = {
     },
     servers: [
       {
-        url: "http://localhost:8000", // Adjust if necessary
+        url: process.env.NODE_ENV === "production" ? process.env.BETTER_AUTH_URL : "http://localhost:8000",
       },
     ],
   },
