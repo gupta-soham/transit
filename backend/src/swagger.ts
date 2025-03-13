@@ -18,7 +18,7 @@ const options: swaggerJsdoc.Options = {
       { url: "https://transit-be.vercel.app", description: "Production server" },
     ],
   },
-  apis: ["./**/*.ts"], // Ensures all .ts files, including routes, are scanned
+  apis: ["./src/routes/userRoutes.ts", "./src/routes/travelRoutes.ts", "./src/routes/addMember.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
